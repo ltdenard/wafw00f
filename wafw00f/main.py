@@ -38,6 +38,7 @@ class WAFW00F(waftoolsengine):
         self.attackres = None
         waftoolsengine.__init__(self, target, debuglevel, path, proxies, followredirect, extraheaders)
         self.knowledge = dict(generic=dict(found=False, reason=''), wafname=list())
+        self.rq = self.Request()
 
     def normalRequest(self):
         return self.Request()
@@ -162,7 +163,7 @@ class WAFW00F(waftoolsengine):
     def matchHeader(self, headermatch, attack=False):
         if attack:
             r = self.attackres
-        else: r = rq
+        else: r = self.rq
         if r is None:
             return
         header, match = headermatch
@@ -182,7 +183,7 @@ class WAFW00F(waftoolsengine):
     def matchStatus(self, statuscode, attack=True):
         if attack:
             r = self.attackres
-        else: r = rq
+        else: r = self.rq
         if r is None:
             return
         if r.status_code == statuscode:
@@ -195,7 +196,7 @@ class WAFW00F(waftoolsengine):
     def matchReason(self, reasoncode, attack=True):
         if attack:
             r = self.attackres
-        else: r = rq
+        else: r = self.rq
         if r is None:
             return
         # We may need to match multiline context in response body
@@ -206,7 +207,7 @@ class WAFW00F(waftoolsengine):
     def matchContent(self, regex, attack=True):
         if attack:
             r = self.attackres
-        else: r = rq
+        else: r = self.rq
         if r is None:
             return
         # We may need to match multiline context in response body
@@ -416,7 +417,7 @@ def main():
         attacker = WAFW00F(target, debuglevel=options.verbose, path=path,
                     followredirect=options.followredirect, extraheaders=extraheaders,
                         proxies=proxies)
-        global rq
+        # global rq
         rq = attacker.normalRequest()
         if rq is None:
             log.error('Site %s appears to be down' % hostname)
